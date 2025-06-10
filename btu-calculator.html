@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BTU Calculator</title>
+    <style>
+        label { display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>BTU Calculator</h2>
+
+    <!-- Unit Selection -->
+    <label>
+        Measurement System:
+        <select id="unitSystem">
+            <option value="imperial">Imperial (ft, °F)</option>
+            <option value="metric">Metric (m, °C)</option>
+        </select>
+    </label>
+
+    <!-- Area or Volume -->
+    <label>
+        Input Type:
+        <select id="inputType">
+            <option value="area">Area + Ceiling Height</option>
+            <option value="volume">Volume</option>
+        </select>
+    </label>
+
+    <div id="dimensions">
+        <label>Length: <input type="number" id="length"></label>
+        <label>Width: <input type="number" id="width"></label>
+        <label id="ceilingHeightLabel">Ceiling Height: <input type="number" id="height"></label>
+    </div>
+
+    <label id="volumeLabel" style="display: none;">
+        Volume: <input type="number" id="volumeInput">
+    </label>
+
+    <!-- Temperature -->
+    <label>Target Temperature: <input type="number" id="targetTemp"></label>
+    <label>Outside Temperature: <input type="number" id="outsideTemp"></label>
+    
+    <!-- Insulation -->
+    <fieldset>
+        <legend>Insulation Level</legend>
+        <label><input type="radio" name="insulation" value="poor" checked> Poor</label>
+        <label><input type="radio" name="insulation" value="average"> Average</label>
+        <label><input type="radio" name="insulation" value="good"> Good</label>
+    </fieldset>
+
+    <!-- Result -->
+    <button onclick="calculateBTU()">Calculate BTU</button>
+    <p id="result"></p>
+    
+    <script>
+        const insulationFactors = {
+            imperial: { poor: 30, average: 20, good: 10 },
+            metric: { poor: 1.1, average: 0.7, good: 0.4 } // approx. values in W/m^3 * K
+        };
+
+        document.getElementById('inputType').addEventListener('change', function() {
+            const isVolume = this.value === 'volume';
+            document.getElementById('volumeLabel').style.display = isVolume ? 'block' : 'none';
+            document.getElementById('dimensions').style.display = isVolume ? 'none' : 'block';
+        });
+
+        function calculateBTU() {
+            const unitSystem = document.getElementById('unitSystem').value;
+            const inputType = document.getElementById('inputType').value;
+            const insulation = document.querySelector('input[name="insulation"]:checked').value;
+
+            const targetTemp = parseFloat(document.getElementById('targetTemp').value);
+            const outsideTemp = parseFloat(document.getElementById('outsideTemp').value);
+            const deltaT = Math.abs(targetTemp - outsideTemp);
+
+            let volume;
+            if (inputType === 'volume') {
+                volume = parseFloat(document.getElementById('volumeInput').value);
+            } else {
+                const length = parseFloat(document.getElementById('length').value);
+                const width = parseFloat(document.getElementById('width').value);
+                const height = parseFloat(document.getElementById('height').value);
+                volume = length * width * height;
+            }
+
+            const factor = insulationFactors[unitSystem][insulation];
+            let btu;
+
+            if (unitSystem === 'imperial') {
+                btu = volume * deltaT * factor;
+            } else {
+                const watts = volume * deltaT * factor;
+                btu = watts * 3.412 // convert watts to BTU/hr
+            }
+
+            document.getElementById('result').textContent = `Required Heat Output: ${btu.toFixed(2)} BTU/hr`;
+        }
+    </script>
+</body>
+</html>
