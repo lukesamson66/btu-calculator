@@ -101,6 +101,12 @@
                 return;
             }
             
+            // Heating only
+            if (targetTemp <= outsideTemp) {
+                document.getElementById('result').textContent = `Required Heat Output: 0 BTU/hr (target temperature is lower than the outside temperature)`;
+                return;
+            }
+            
             let volume;
             if (inputType === 'volume') {
                 const vol = document.getElementById('volumeInput').value;
@@ -123,6 +129,7 @@
             }
 
             const deltaT = Math.abs(targetTemp - outsideTemp);
+            
             const factor = insulationFactors[unitSystem][insulation];
             
             let btu;
