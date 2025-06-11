@@ -3,6 +3,7 @@
     <title>BTU Calculator</title>
     <style>
         label { display: block; margin-top: 10px; }
+        .error { color:red; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -27,18 +28,18 @@
     </label>
 
     <div id="dimensions">
-        <label>Length: <input type="number" id="length"></label>
-        <label>Width: <input type="number" id="width"></label>
-        <label id="ceilingHeightLabel">Ceiling Height: <input type="number" id="height"></label>
+        <label>Length (ft): <input type="number" id="length"></label>
+        <label>Width (ft): <input type="number" id="width"></label>
+        <label id="ceilingHeightLabel">Ceiling Height (ft): <input type="number" id="height"></label>
     </div>
 
     <label id="volumeLabel" style="display: none;">
-        Volume: <input type="number" id="volumeInput">
+        Volume (ft³): <input type="number" id="volumeInput">
     </label>
 
     <!-- Temperature -->
-    <label>Target Temperature: <input type="number" id="targetTemp"></label>
-    <label>Outside Temperature: <input type="number" id="outsideTemp"></label>
+    <label>Target Temperature (°F): <input type="number" id="targetTemp"></label>
+    <label>Outside Temperature (°F): <input type="number" id="outsideTemp"></label>
     
     <!-- Insulation -->
     <fieldset>
@@ -58,32 +59,52 @@
             metric: { poor: 1.1, average: 0.7, good: 0.4 } // approx. values in W/m^3 * K
         };
 
-        document.getElementById('inputType').addEventListener('change', function() {
+        const unitSystemSelect = document.getElementById('unitSystem');
+        const inputTypeSelect = document.getElementById('inputType');
+
+        unitSystemSelect.addEventListener('change', updateLabels);
+        inputTypeSelect.addEventListener('change', function() {
             const isVolume = this.value === 'volume';
             document.getElementById('volumeLabel').style.display = isVolume ? 'block' : 'none';
             document.getElementById('dimensions').style.display = isVolume ? 'none' : 'block';
         });
 
+        function updateLabels() {
+            const unitSystem = unitSystemSelect.value;
+            const units = unitSystem === 'imperial' ? 'ft' : 'm';
+            const tempUnit = unitSystem === 'imperial' ?  '°F' : '°C';
+            const volUnit = unitSystem === 'imperial' ? 'ft³' : 'm³';
+
+            document.getElementById('lengthLabel').innerHTML = `Length (${units}): <input type="number" id="length">`;
+            document.getElementById('widthLabel').innerHTML = `Width (${units}): <input type="number" id="width">`;
+            document.getElementById('ceilingHeightLabel').innerHTML = `Ceiling Height (${units}): <input type="number" id="height">`;
+
+            document.getElementById('volumeLabel').innerHTML = `Volume (${volUnit}): <input type="number" id="volumeInput">`;
+            document.getElementById('targetTempLabel').innerHTML = `Target Temperature (${tempUnit}): <input type="number" id="targetTemp">`;
+            document.getElementById('outsideTempLabel').innerHTML = `Outside Temperature (${tempUnit}): <input type="number" id="outsideTemp">`;
+        }
+
         function calculateBTU() {
             const unitSystem = document.getElementById('unitSystem').value;
             const inputType = document.getElementById('inputType').value;
-            const insulation = document.querySelector('input[name="insulation"]:checked').value;
+            const insulation = document.querySelector('input[name="insulation"]:checked')?.value;
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = ''; // Clear any previous errors
 
             const targetTemp = parseFloat(document.getElementById('targetTemp').value);
             const outsideTemp = parseFloat(document.getElementById('outsideTemp').value);
             
-            let volume;
-            
             // Input validation
             if (!targetTemp || !outsideTemp) {
-                alert("Please enter both target and outside temperatures.");
+                errorMsg.textContent = "Please enter both target and outside temperatures.";
                 return;
             }
             
+            let volume;
             if (inputType === 'volume') {
                 const vol = document.getElementById('volumeInput').value;
                 if (!vol) {
-                    alert("Please enter a volume value.");
+                    errorMsg.textContent = "Please enter a volume value.";
                     return;
                 }
                 volume = parseFloat(vol);
@@ -93,7 +114,7 @@
                 const height = document.getElementById('height').value;
 
                 if (!length || !width || !height) {
-                    alert("Please enter length, width, and ceiling height.");
+                    errorMsg.textContent = "Please enter length, width, and ceiling height.";
                     return;
                 }
 
@@ -114,5 +135,9 @@
 
             document.getElementById('result').textContent = `Required Heat Output: ${btu.toFixed(2)} BTU/hr`;
         }
+
+        // Initialize labels
+        updateLabels();
+        
     </script>
 </body>
