@@ -1,205 +1,347 @@
 <head>
-    <meta charset="UTF-8">
-    <title>BTU Calculator</title>
-    <style>
-        body {
-            font-family: Inter;
-            background: #f4f6f9;
-            display: block;
-            padding: 40px;
-        }
+  <meta charset="UTF-8" />
+  <title>BTU Calculator</title>
+  <style>
+    #btu-calculator {
+      font-family: Inter, sans-serif;
+    }
 
-        .calculator {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 0 auto;
-        }
+    #btu-calculator .calculator {
+      background: white !important;
+      padding: 30px 40px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+      max-width: 500px !important;
+      margin: 0 auto !important;
+    }
 
-        h1 {
-            color: #dd823b;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    #btu-calculator h1, #btu-calculator h3 {
+      color: #dd823b !important;
+      margin-bottom: 20px !important;
+      text-align: center !important;
+    }
+    
+    #btu-calculator fieldset legend {
+        margin-bottom: 0px !important;
+    }
 
-        label {
-            display: block;
-            margin-top: 10px;
-            color: #444;
-        }
+    #btu-calculator label {
+      display: block !important;
+      margin-top: 12px !important;
+      color: #444 !important;
+    }
 
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px 10px;
-            font-size: 16px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
+    #btu-calculator label > span,
+    #btu-calculator label > input,
+    #btu-calculator label > select {
+      display: block !important;
+      width: 100% !important;
+    }
 
-        fieldset {
-            margin-top: 20px;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
+    #btu-calculator input[type="number"],
+    #btu-calculator select {
+      padding: 8px 10px !important;
+      font-size: 16px !important;
+      margin-top: 4px !important;
+      border: 1px solid #ccc !important;
+      border-radius: 6px !important;
+    }
+    
+    #btu-calculator input:disabled {
+        background-color: #eee !important;
+        cursor: not-allowed !important;
+    }
 
-        .error {
-            color:red;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+    #btu-calculator fieldset {
+      margin-top: 20px !important;
+      padding: 10px 15px !important;
+      border-radius: 8px !important;
+      border: 1px solid #ccc !important;
+    }
+    
+    #btu-calculator fieldset label {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        margin-right: 15px !important;
+    }
 
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #dd823b;
-        }
-    </style>
+    #btu-calculator fieldset input {
+        vertical-align: middle !important;
+        margin-right: 5px !important;
+    }
+    
+    #btu-calculator .error {
+      color: red !important;
+      font-weight: bold !important;
+      margin-top: 10px !important;
+    }
+
+    #btu-calculator #result {
+      margin-top: 20px !important;
+      font-size: 18px !important;
+      font-weight: bold !important;
+      color: #dd823b !important;
+    }
+  </style>
 </head>
 <body>
-    <h3>BTU Calculator</h3>
-
-    <!-- Unit Selection -->
-    <label>
-        Measurement System:
-        <select id="unitSystem">
+    <div id="btu-calculator">
+      <div class="calculator">
+        <h3>BTU Calculator</h3>
+    
+        <!-- Measurement System -->
+        <label>
+          <span>Measurement System:</span>
+          <select id="unitSystem">
             <option value="imperial">Imperial (ft, °F)</option>
             <option value="metric">Metric (m, °C)</option>
-        </select>
-    </label>
-
-    <!-- Area or Volume -->
-    <label>
-        Input Type:
-        <select id="inputType">
+          </select>
+        </label>
+    
+        <!-- Input Type -->
+        <label>
+          <span>Input Type:</span>
+          <select id="inputType" onchange="updateInputVisibility()">
             <option value="area">Area + Ceiling Height</option>
             <option value="volume">Volume</option>
-        </select>
-    </label>
-
-    <div id="dimensions">
-        <label id="lengthLabel">Length (ft): <input type="number" id="length"></label>
-        <label id="widthLabel">Width (ft): <input type="number" id="width"></label>
-        <label id="ceilingHeightLabel">Ceiling Height (ft): <input type="number" id="height"></label>
+          </select>
+        </label>
+    
+        <!-- Volume Input -->
+        <label id="volumeLabel" style="display: none;">
+          <span id="volumeText">Volume (ft³):</span>
+          <input type="number" id="volumeInput" />
+        </label>
+    
+        <!-- Dimensions -->
+        <label id="lengthLabel">
+          <span id="lengthText">Length (ft):</span>
+          <input type="number" id="length" />
+        </label>
+    
+        <label id="widthLabel">
+          <span id="widthText">Width (ft):</span>
+          <input type="number" id="width" />
+        </label>
+    
+        <label id="ceilingHeightLabel">
+          <span id="ceilingText">Ceiling Height (ft):</span>
+          <input type="number" id="height" />
+        </label>
+    
+        <!-- Temperatures -->
+        <label>
+          <span id="targetTempText">Target Temperature (°F):</span>
+          <input type="number" id="targetTemp" />
+        </label>
+    
+        <label>
+          <span id="outsideTempText">Outside Temperature (°F):</span>
+          <input type="number" id="outsideTemp" />
+        </label>
+    
+        <!-- Insulation -->
+        <fieldset>
+          <legend>Insulation Level</legend>
+          <label><input type="radio" name="insulation" value="poor" checked /> Poor</label>
+          <label><input type="radio" name="insulation" value="average" /> Average</label>
+          <label><input type="radio" name="insulation" value="good" /> Good</label>
+        </fieldset>
+    
+        <!-- Calculate Button -->
+        <button style="margin-top: 15px;" onclick="calculateBTU()">Calculate BTU</button>
+        <p id="errorMsg" class="error"></p>
+        <h4 id="result"></h4>
+        <div id = "suggestions"></div>
+      </div>
     </div>
 
-    <label id="volumeLabel" style="display: none;">
-        Volume (ft³): <input type="number" id="volumeInput">
-    </label>
-
-    <!-- Temperature -->
-    <label id="targetTempLabel">Target Temperature (°F): <input type="number" id="targetTemp"></label>
-    <label id="outsideTempLabel">Outside Temperature (°F): <input type="number" id="outsideTemp"></label>
+  <script>
+    const insulationFactors = {
+      imperial: { poor: 30, average: 20, good: 10 },
+      metric: { poor: 1.1, average: 0.7, good: 0.4 }
+    };
     
-    <!-- Insulation -->
-    <fieldset>
-        <legend>Insulation Level</legend>
-        <label><input type="radio" name="insulation" value="poor" checked> Poor</label>
-        <label><input type="radio" name="insulation" value="average"> Average</label>
-        <label><input type="radio" name="insulation" value="good"> Good</label>
-    </fieldset>
+    const heaterModels = [
+         {
+            model: "H-150",
+            fuel: "Propane",
+            minBTU: 50000,
+            maxBTU: 150000,
+        },
+        {
+            model: "HO-400",
+            fuel: "Diesel or Kerosene",
+            minBTU: 325000,
+            maxBTU: 390000,
+        },
+        {
+            model: "HO-400R",
+            fuel: "Diesel or Kerosene",
+            minBTU: 325000,
+            maxBTU: 390000,
+        },
+        {
+            model: "HD-400",
+            fuel: "Natural Gas or Propane",
+            minBTU: 325000,
+            maxBTU: 390000,
+        },
+        {
+            model: "HD-400R",
+            fuel: "Natural Gas or Propane",
+            minBTU: 325000,
+            maxBTU: 390000,
+        },
+        {
+            model: "HT-TB1000 Trailblazer",
+            fuel: "Diesel or Kerosene",
+            minBTU: 650000,
+            maxBTU: 780000,
+            combined: true
+        }
+    ];
 
-    <!-- Result -->
-    <button style="margin-top: 10px;" onclick="calculateBTU()">Calculate BTU</button>
-    <p id="errorMsg" class="error"></p>
-    <h4 style="margin-top: 30px" id="result"></h4>
-    
-    <script>
-        const insulationFactors = {
-            imperial: { poor: 30, average: 20, good: 10 },
-            metric: { poor: 1.1, average: 0.7, good: 0.4 } // approx. values in W/m^3 * K
-        };
+    const unitSystemSelect = document.getElementById('unitSystem');
+    const inputTypeSelect = document.getElementById('inputType');
 
-        const unitSystemSelect = document.getElementById('unitSystem');
-        const inputTypeSelect = document.getElementById('inputType');
+    unitSystemSelect.addEventListener('change', updateLabels);
 
-        unitSystemSelect.addEventListener('change', updateLabels);
-        inputTypeSelect.addEventListener('change', function() {
-            const isVolume = this.value === 'volume';
-            document.getElementById('volumeLabel').style.display = isVolume ? 'block' : 'none';
-            document.getElementById('dimensions').style.display = isVolume ? 'none' : 'block';
-        });
+    function updateInputVisibility() {
+        const inputType = inputTypeSelect.value;
+        const isVolume = inputType === 'volume';
 
-        function updateLabels() {
-            const unitSystem = unitSystemSelect.value;
-            const units = unitSystem === 'imperial' ? 'ft' : 'm';
-            const tempUnit = unitSystem === 'imperial' ?  '°F' : '°C';
-            const volUnit = unitSystem === 'imperial' ? 'ft³' : 'm³';
+        // Enable/disable volume input
+        document.getElementById('volumeInput').disabled = !isVolume;
+      
+        // Enable/disable dimension inputs
+        document.getElementById('length').disabled = isVolume;
+        document.getElementById('width').disabled = isVolume;
+        document.getElementById('height').disabled = isVolume;
+    }
 
-            document.getElementById('lengthLabel').innerHTML = `Length (${units}): <input type="number" id="length">`;
-            document.getElementById('widthLabel').innerHTML = `Width (${units}): <input type="number" id="width">`;
-            document.getElementById('ceilingHeightLabel').innerHTML = `Ceiling Height (${units}): <input type="number" id="height">`;
+    function updateLabels() {
+      const unitSystem = unitSystemSelect.value;
+      const units = unitSystem === 'imperial' ? 'ft' : 'm';
+      const tempUnit = unitSystem === 'imperial' ? '°F' : '°C';
+      const volUnit = unitSystem === 'imperial' ? 'ft³' : 'm³';
 
-            document.getElementById('volumeLabel').innerHTML = `Volume (${volUnit}): <input type="number" id="volumeInput">`;
-            document.getElementById('targetTempLabel').innerHTML = `Target Temperature (${tempUnit}): <input type="number" id="targetTemp">`;
-            document.getElementById('outsideTempLabel').innerHTML = `Outside Temperature (${tempUnit}): <input type="number" id="outsideTemp">`;
+      document.getElementById('lengthText').textContent = `Length (${units}):`;
+      document.getElementById('widthText').textContent = `Width (${units}):`;
+      document.getElementById('ceilingText').textContent = `Ceiling Height (${units}):`;
+      document.getElementById('volumeText').textContent = `Volume (${volUnit}):`;
+      document.getElementById('targetTempText').textContent = `Target Temperature (${tempUnit}):`;
+      document.getElementById('outsideTempText').textContent = `Outside Temperature (${tempUnit}):`;
+    }
+
+    function calculateBTU() {
+      const unitSystem = unitSystemSelect.value;
+      const inputType = inputTypeSelect.value;
+      const insulation = document.querySelector('input[name="insulation"]:checked')?.value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
+
+      const targetTemp = parseFloat(document.getElementById('targetTemp').value);
+      const outsideTemp = parseFloat(document.getElementById('outsideTemp').value);
+
+      if (isNaN(targetTemp) || isNaN(outsideTemp)) {
+        errorMsg.textContent = 'Please enter both target and outside temperatures.';
+        return;
+      }
+
+      if (targetTemp <= outsideTemp) {
+        document.getElementById('result').textContent = `Required Heat Output: 0 BTU/hr (target temperature is lower than the outside temperature)`;
+        return;
+      }
+
+      let volume;
+
+      if (inputType === 'volume') {
+        const vol = parseFloat(document.getElementById('volumeInput').value);
+        if (isNaN(vol)) {
+          errorMsg.textContent = 'Please enter a volume value.';
+          return;
+        }
+        volume = vol;
+      } else {
+        const length = parseFloat(document.getElementById('length').value);
+        const width = parseFloat(document.getElementById('width').value);
+        const height = parseFloat(document.getElementById('height').value);
+
+        if (isNaN(length) || isNaN(width) || isNaN(height)) {
+          errorMsg.textContent = 'Please enter length, width, and ceiling height.';
+          return;
         }
 
-        function calculateBTU() {
-            const unitSystem = document.getElementById('unitSystem').value;
-            const inputType = document.getElementById('inputType').value;
-            const insulation = document.querySelector('input[name="insulation"]:checked')?.value;
-            const errorMsg = document.getElementById('errorMsg');
-            errorMsg.textContent = ''; // Clear any previous errors
+        volume = length * width * height;
+      }
 
-            const targetTemp = parseFloat(document.getElementById('targetTemp').value);
-            const outsideTemp = parseFloat(document.getElementById('outsideTemp').value);
-            
-            // Input validation
-            if (!targetTemp || !outsideTemp) {
-                errorMsg.textContent = "Please enter both target and outside temperatures.";
-                return;
-            }
-            
-            // Heating only
-            if (targetTemp <= outsideTemp) {
-                document.getElementById('result').textContent = `Required Heat Output: 0 BTU/hr (target temperature is lower than the outside temperature)`;
-                return;
-            }
-            
-            let volume;
-            if (inputType === 'volume') {
-                const vol = document.getElementById('volumeInput').value;
-                if (!vol) {
-                    errorMsg.textContent = "Please enter a volume value.";
-                    return;
-                }
-                volume = parseFloat(vol);
-            } else {
-                const length = document.getElementById('length').value;
-                const width = document.getElementById('width').value;
-                const height = document.getElementById('height').value;
+      const deltaT = targetTemp - outsideTemp;
+      const factor = insulationFactors[unitSystem][insulation];
+      let btu;
 
-                if (!length || !width || !height) {
-                    errorMsg.textContent = "Please enter length, width, and ceiling height.";
-                    return;
-                }
+      if (unitSystem === 'imperial') {
+        btu = volume * deltaT * factor;
+      } else {
+        const watts = volume * deltaT * factor;
+        btu = watts * 3.412;
+      }
 
-                volume = parseFloat(length)*parseFloat(width)*parseFloat(height);
-            }
+      const formattedBTU = Math.round(btu).toLocaleString();
+      document.getElementById('result').innerHTML = `Required Heat Output: ${formattedBTU} BTU/hr`;
+      document.getElementById('suggestions').innerHTML = suggestHeaters(btu);
+    }
 
-            const deltaT = Math.abs(targetTemp - outsideTemp);
-            
-            const factor = insulationFactors[unitSystem][insulation];
-            
-            let btu;
+function suggestHeaters(btuRequired) {
+    // 1. Find single heaters matching the range
+    const singleMatches = heaterModels.filter(h => h.maxBTU >= btuRequired);
 
-            if (unitSystem === 'imperial') {
-                btu = volume * deltaT * factor;
-            } else {
-                const watts = volume * deltaT * factor;
-                btu = watts * 3.412 // convert watts to BTU/hr
-            }
-            btu = Math.round(btu)
-            document.getElementById('result').textContent = `Required Heat Output: ${btu.toLocaleString()} BTU/hr`;
-        }
+    if (singleMatches.length > 0) {
+        return `
+            <p>Suggested Heaters:</p>
+            <ul>
+                ${singleMatches.map(h => `
+                    <li>
+                        <strong>${h.model}</strong> — ${h.fuel} (${h.minBTU.toLocaleString()} - ${h.maxBTU.toLocaleString()} BTU/hr)
+                    </li>`).join("")}
+            </ul>
+        `;
+    }
 
-        // Initialize labels
-        updateLabels();
-        
-    </script>
+    // 2. No single heater covers it, suggest multiples of heaters that could cover
+    // Filter heaters that can cover at least part of the load (maxBTU > 0)
+    const multiples = heaterModels
+        .filter(h => h.maxBTU > 0)
+        .map(h => {
+            const unitsNeeded = Math.ceil(btuRequired / h.maxBTU);
+            return {
+                model: h.model,
+                fuel: h.fuel,
+                units: unitsNeeded,
+                totalBTU: unitsNeeded * h.maxBTU
+            };
+        })
+        // Sort by totalBTU ascending (suggest most efficient first)
+        .sort((a, b) => a.totalBTU - b.totalBTU);
+
+    if (multiples.length > 0) {
+        return `
+            <p>No single model matches the required output. Suggested combinations:</p>
+            <ul>
+                ${multiples.map(h => `
+                    <li>
+                        ${h.units} x <strong>${h.model}</strong> — ${h.fuel} (total max output: ${h.totalBTU.toLocaleString()} BTU/hr)
+                    </li>`).join("")}
+            </ul>
+            <p>Please <a href="/contact-us">contact us</a> for further assistance.</p>
+        `;
+    }
+
+    // Fallback
+    return `<p>No suitable heaters found. Please <a href="/contact">contact us</a> for assistance.</p>`;
+}
+    // Initialize on first load
+    updateLabels();
+    updateInputVisibility();
+  </script>
 </body>
